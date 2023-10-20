@@ -9,6 +9,27 @@ route.get("/", (req, res) => {
     .then((usr) => res.send(usr))
     .catch((err) => res.send(err));
 });
+//fetch with search
+route.get("/search", (req, resp) => {
+  const { name, age, email } = req.query;
+  const buildSearch = () => {
+    const searchParams = {};
+    if (name) searchParams.name = name;
+    if (age) searchParams.age = age;
+    if (email) searchParams.email = email;
+    return searchParams;
+  };
+  const params = buildSearch();
+  if (Object.keys(params).length === 0)
+    return resp.status(400).json({
+      status: "error",
+      message: "At least one search parameter (name, age, email) is required.",
+    });
+  user
+    .find(params)
+    .then((usr) => resp.send(usr))
+    .catch((rr) => resp.send(rr));
+});
 
 // fetch by id
 route.get("/:id", (req, resp) => {
@@ -20,7 +41,6 @@ route.get("/:id", (req, resp) => {
 });
 //create user
 route.post("/create", (req, resp) => {
-  console.log(req.body);
   user
     .create(req.body)
     .then((rp) => resp.sendStatus(201))
